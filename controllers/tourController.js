@@ -22,18 +22,27 @@ const getAllTours = async (req, res) => {
 
     // BUILD QUERY
     // Make shallow coppy
+    // 1) Filtering
     const queryObj = { ...req.query };
-    const excludFields = ['page', 'sort', 'limit', 'fields'];
+    const excludeFields = ['page', 'sort', 'limit', 'fields'];
 
-    excludFields.forEach((field) => {
+    excludeFields.forEach((field) => {
       delete queryObj[field];
     });
+
+    // 2) Advanced filtering
+    // { duration: { gte: '5' }, difficulty: 'easy' }
+    // { duration: { $gte: '5' }, difficulty: 'easy' }
+    var queryStr = JSON.stringify(queryObj);
+    // console.log(queryStr);
+
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     // no await since we use it to later on use sort() or other function
     // If we use await It will come back with document
     // right now it is a promise
-    const query = Tour.find(queryObj);
-    console.log(query);
+    const query = Tour.find(JSON.parse(queryStr));
+    // console.log(query);
 
     // const query = await Tour.find()
     //   .where('duration')
