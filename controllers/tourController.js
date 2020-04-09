@@ -18,7 +18,33 @@ const Tour = require('../models/tourModel');
 // 2) ROUTE HANDLER
 const getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    console.log(req.query);
+
+    // BUILD QUERY
+    // Make shallow coppy
+    const queryObj = { ...req.query };
+    const excludFields = ['page', 'sort', 'limit', 'fields'];
+
+    excludFields.forEach((field) => {
+      delete queryObj[field];
+    });
+
+    // no await since we use it to later on use sort() or other function
+    // If we use await It will come back with document
+    // right now it is a promise
+    const query = Tour.find(queryObj);
+    console.log(query);
+
+    // const query = await Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    // EXECUTE QUERY
+    const tours = await query;
+
+    // SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: tours.length,
