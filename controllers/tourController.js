@@ -53,6 +53,33 @@ const getAllTours = async (req, res) => {
       query = query.sort('-createdAt');
     }
 
+    // 4) Field limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      console.log(fields);
+      query = query.select(fields).select('-_id');
+    } else {
+      query = query.select('-__v');
+    }
+
+    // 5. Pagination
+
+    // convert string to number
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    if (req.query.page) {
+      // Return number of document
+      const numTours = await Tour.countDocuments();
+      if (numTours <= skip) {
+        // throw error
+        throw new Error('This page does not exist');
+      }
+    }
+
+    query = query.skip(skip).limit(limit);
+
     // const query = await Tour.find()
     //   .where('duration')
     //   .equals(5)
