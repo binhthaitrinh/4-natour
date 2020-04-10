@@ -41,8 +41,17 @@ const getAllTours = async (req, res) => {
     // no await since we use it to later on use sort() or other function
     // If we use await It will come back with document
     // right now it is a promise
-    const query = Tour.find(JSON.parse(queryStr));
+    var query = Tour.find(JSON.parse(queryStr));
     // console.log(query);
+
+    // 3) Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      // console.log(sortBy);
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
 
     // const query = await Tour.find()
     //   .where('duration')
