@@ -29,4 +29,14 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
+// Only reach here if not caught in any about routers
+// meaning routes we haven't defined
+// giberish routes
+app.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Can't find ${req.originalUrl} on this server!`,
+  });
+});
+
 module.exports = app;
