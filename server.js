@@ -4,6 +4,13 @@ const mongoose = require('mongoose');
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
+process.on('uncaughtException', (err) => {
+  console.log(err.name, err.message);
+  console.log('UNCAUGHT EXCEPTION. SHUTTING DOWN...');
+
+  process.exit(1);
+});
+
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
@@ -48,4 +55,16 @@ mongoose
 // console.log(process.env);
 
 const PORT = process.env.PORT || 4444;
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
+// Handle all promise rejection
+// act like the last safety net
+process.on('unhandledRejection', (err) => {
+  console.log(err.name, err.message);
+  console.log('UNHANDLER REJECTION! Shutting down...');
+  // 0 for success, 1 for uncaught exception
+  // .close() to finish executing current processes
+  server.close(() => {
+    process.exit(1);
+  });
+});
