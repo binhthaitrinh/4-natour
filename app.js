@@ -5,6 +5,9 @@ const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
+
 const app = express();
 
 // 1) MIDDLEWARE
@@ -33,10 +36,22 @@ app.use('/api/v1/users', userRouter);
 // meaning routes we haven't defined
 // giberish routes
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server!`,
-  });
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Can't find ${req.originalUrl} on this server!`,
+  // });
+
+  // const err = new Error(`Canot find ${req.originalUrl} on this server!`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
+
+  // if next() has an argument, then it will assume there will be
+  // error and jump start to global error handler
+  // skip any other middleware
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
+
+// ERROR HANDLING MIDDLEWARE
+app.use(globalErrorHandler);
 
 module.exports = app;
