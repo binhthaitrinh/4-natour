@@ -7,7 +7,11 @@ const {
   updateUser,
 } = require('../controllers/userController');
 
+const authController = require('../controllers/authController');
+
 const userRouter = express.Router();
+
+userRouter.post('/signup', authController.signup);
 
 userRouter.route('/').get(getAllUsers).post(createUser);
 
