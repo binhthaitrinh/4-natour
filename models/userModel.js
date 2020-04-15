@@ -20,6 +20,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     require: [true, 'Please provide your password'],
     minlength: 8,
+    // not send back password to client
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -47,6 +49,14 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+// instance method, available on all deocuments
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 // FAT MODEL THIN CONTROLLER PHILOSOPHY
 
