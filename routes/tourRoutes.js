@@ -24,6 +24,14 @@ tourRouter.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 tourRouter.route('/').get(authController.protect, getAllTours).post(createTour);
 
-tourRouter.route('/:id').get(getTour).delete(deleteTour).patch(updateTour);
+tourRouter
+  .route('/:id')
+  .get(getTour)
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    deleteTour
+  )
+  .patch(updateTour);
 
 module.exports = tourRouter;
