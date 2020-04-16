@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpire: Date,
+  passwordResetExpires: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -56,6 +56,14 @@ userSchema.pre('save', async function (next) {
   // We donot need to store password confirm into database
   // it is only used to verify password
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  // ensure token is always created after password has been changed
+  // avoid lag
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
@@ -90,7 +98,7 @@ userSchema.methods.createPasswordResetToken = function () {
 
   console.log({ resetToken }, this.passwordResetToken);
 
-  this.passwordResetExpire = Date.now() + 10 * 60 * 1000;
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
 };
