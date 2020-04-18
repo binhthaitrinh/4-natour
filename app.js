@@ -1,6 +1,10 @@
 const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -10,14 +14,37 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
-// 1) MIDDLEWARE
+// set security http headers
+app.use(helmet());
+
+// 1)GLOBAL  MIDDLEWARE
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+const limiter = rateLimit({
+  max: 100,
+  // allow 100 req from the same IP in 1 hour
+  windowMs: 1 * 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+
+// only limit to route with /api
+app.use('/api', limiter);
+
 // Middleware
 // app.use is middleware
-app.use(express.json());
+// body parser middleware
+// reading data from body into req.body
+// limit data from body to 10kb
+app.use(express.json({ limit: '10kb' }));
+
+// Data sanitization against noSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+// clean any user input from malicious HTML code
+app.use(xss());
 
 // Serve static files
 app.use(express.static(`${__dirname}/public`));
