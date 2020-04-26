@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const User = require('./userModel');
 // const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
@@ -80,6 +81,33 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      // [longtitude, latitude]
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    // embded document
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: Array,
   },
   {
     // to include virtual properties into results
@@ -100,6 +128,18 @@ tourSchema.pre('save', function (next) {
   // next() like for mongodb middleware
   next();
 });
+
+// // embed guides into tours for each save
+// tourSchema.pre('save', async function (next) {
+//   // return listo f promises
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+
+//   // await to wait for promise to resolve
+//   // overide this.guides
+//   this.guides = await Promise.all(guidesPromises);
+
+//   next();
+// });
 
 // tourSchema.post('save', function (doc, next) {
 //   console.log(doc);
