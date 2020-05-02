@@ -113,6 +113,7 @@ const getAllTours = catchAsync(async (req, res, next) => {
 });
 
 const getTour = catchAsync(async (req, res, next) => {
+  // also populate guides information
   const tour = await Tour.findById(req.params.id);
 
   if (!tour) {
