@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const reviewSchema = new mongoose.Schema(
   {
     review: {
-      required: [true, 'a review must have content'],
+      required: [true, 'Review must have content'],
       type: String,
     },
     rating: {
@@ -32,6 +32,20 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'tour',
+    select: 'name',
+  });
+
+  this.populate({
+    path: 'user',
+    select: 'name photo',
+  });
+
+  next();
+});
 
 const Review = mongoose.model('Review', reviewSchema);
 module.exports = Review;
