@@ -128,6 +128,15 @@ tourSchema.virtual('durationWeeks').get(function () {
   return Math.ceil(this.duration / 7);
 });
 
+// VIRTUAL POPULATE
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  // name of the field of current model that is stored as ref in Review
+  foreignField: 'tour',
+  // id is how it's called in this model in the Review model
+  localField: '_id',
+});
+
 // DOCUMENT MIDDLEWARE: run before .save() and .create(), not one .insertMany
 // Create slug for each document
 tourSchema.pre('save', function (next) {

@@ -114,7 +114,9 @@ const getAllTours = catchAsync(async (req, res, next) => {
 
 const getTour = catchAsync(async (req, res, next) => {
   // also populate guides information
-  const tour = await await Tour.findById(req.params.id);
+  const tour = await await await Tour.findById(req.params.id).populate(
+    'reviews'
+  );
 
   if (!tour) {
     return next(new AppError('No tour found with that ID', 404));

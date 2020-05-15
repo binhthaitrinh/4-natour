@@ -10,11 +10,16 @@ const {
   getMonthlyPlan,
 } = require('../controllers/tourController');
 const authController = require('../controllers/authController');
+const reviewRouter = require('./reviewRoutes');
+// const reviewController = require('../controllers/reviewController');
 
 const tourRouter = express.Router();
 
 // Param middleware
 // tourRouter.param('id', checkID);
+
+// mounting a router
+tourRouter.use('/:tourId/reviews', reviewRouter);
 
 tourRouter.route('/top-5-cheap').get(aliasTopTours, getAllTours);
 
