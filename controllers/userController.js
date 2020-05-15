@@ -86,12 +86,8 @@ const createUser = (req, res) => {
 
 const deleteUser = factory.deleteOne(User);
 
-const updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-};
+// Do not update passwords with this
+const updateUser = factory.updateOne(User);
 
 module.exports = {
   getAllUsers,
