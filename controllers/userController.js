@@ -57,6 +57,11 @@ const deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+const getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 const createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -79,4 +84,5 @@ module.exports = {
   updateUser,
   updateMe,
   deleteMe,
+  getMe,
 };

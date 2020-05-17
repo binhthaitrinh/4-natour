@@ -25,9 +25,22 @@ tourRouter.route('/top-5-cheap').get(aliasTopTours, getAllTours);
 
 tourRouter.route('/tour-stats').get(getTourStats);
 
-tourRouter.route('/monthly-plan/:year').get(getMonthlyPlan);
+tourRouter
+  .route('/monthly-plan/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    getMonthlyPlan
+  );
 
-tourRouter.route('/').get(authController.protect, getAllTours).post(createTour);
+tourRouter
+  .route('/')
+  .get(getAllTours)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    createTour
+  );
 
 tourRouter
   .route('/:id')
@@ -37,6 +50,10 @@ tourRouter
     authController.restrictTo('admin', 'lead-guide'),
     deleteTour
   )
-  .patch(updateTour);
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    updateTour
+  );
 
 module.exports = tourRouter;

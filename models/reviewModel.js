@@ -1,5 +1,6 @@
 // review / rating / createdAt / ref to tour / ref to user
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -50,6 +51,57 @@ reviewSchema.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+// Static method
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  // this points to current model
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  console.log(stats);
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
+};
+
+reviewSchema.post('save', function () {
+  // this points to current review
+  // this.constructor point to the model that created the document. (Review)
+  this.constructor.calcAverageRatings(this.tour);
+});
+
+// findByIdAndUpdate
+// findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  // in order to send r variable to post below
+  this.r = await this.findOne();
+
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  // retrieve review document from "this"
+  // await this.find(); does NOT work here, query has already executed, thus we have to do this
+  await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
