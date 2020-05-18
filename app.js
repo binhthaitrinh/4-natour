@@ -61,7 +61,7 @@ app.use((req, res, next) => {
 // 3. ROUTE
 app.get('/', (req, res) => {
   res.status(200).render('base', {
-    data: 'The alskdnalsdhaslhd',
+    tour: 'The alskdnalsdhaslhd',
   });
 });
 
