@@ -1,0 +1,17 @@
+//- white space sensitive to write HTML
+doctype html
+html
+    head
+        title Natours
+        link(rel='stylesheet' href='css/style.css' )
+        link(rel='shortcut icon' type='image/png' href='img/favicon.png')
+
+    body
+        h1= data
+        //- data.toUpperCase()
+        //- Unbuffered code, does not render into html
+        //- Template string: #{data}
+        //- if h1= ..., ... is treated as javascript
+        - const x = 9;
+        h2= 2 * x
+        p This is just some text
