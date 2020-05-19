@@ -10,6 +10,7 @@ const xss = require('xss-clean');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -59,16 +60,10 @@ app.use((req, res, next) => {
 });
 
 // 3. ROUTE
-app.get('/', (req, res) => {
-  res.status(200).render('base', {
-    tour: 'The alskdnalsdhaslhd',
-  });
-});
-
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
-
 // Only reach here if not caught in any about routers
 // meaning routes we haven't defined
 // giberish routes
