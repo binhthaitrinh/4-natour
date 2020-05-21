@@ -222,30 +222,43 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 });
 
 // Only for rendering pages, no error!
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
-    // Verify token
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
+    try {
+      // Verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    // 3) Check if user still exists
-    const freshUser = await User.findById(decoded.id);
+      // 3) Check if user still exists
+      const freshUser = await User.findById(decoded.id);
 
-    if (!freshUser) {
+      if (!freshUser) {
+        return next();
+      }
+
+      // 4) Check if user changed password after JWT was issued
+      if (freshUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = freshUser;
+      return next();
+    } catch (err) {
       return next();
     }
-
-    // 4) Check if user changed password after JWT was issued
-    if (freshUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // THERE IS A LOGGED IN USER
-    res.locals.user = freshUser;
-    return next();
   }
 
   next();
-});
+};
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'logout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({ status: 'success' });
+};
