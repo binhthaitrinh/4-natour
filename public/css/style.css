@@ -608,6 +608,20 @@ body {
   -ms-scroll-snap-type: x mandatory;
   scroll-snap-type: x mandatory;
 }
+
+.reviews::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reviews::-webkit-scrollbar-thumb {
+  background: #fff;
+}
+
+.reviews::-webkit-scrollbar {
+  height: 15px;
+  background-color: transparent;
+}
+
 .reviews__card {
   width: 30rem;
   padding: 4rem;
