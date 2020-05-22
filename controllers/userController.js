@@ -40,6 +40,8 @@ const updateMe = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
+  console.log('UPDATEEEEEEEEEEE');
+
   res.status(200).json({
     status: 'success',
     data: {
