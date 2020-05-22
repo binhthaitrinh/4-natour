@@ -1,4 +1,5 @@
 const express = require('express');
+
 const {
   getAllUsers,
   getUser,
@@ -7,6 +8,7 @@ const {
   updateUser,
   updateMe,
   deleteMe,
+  uploadUserPhoto,
   getMe,
 } = require('../controllers/userController');
 
@@ -29,7 +31,13 @@ userRouter.patch('/updateMyPassword', authController.updatePassword);
 
 userRouter.delete('/deleteMe', authController.protect, deleteMe);
 
-userRouter.patch('/updateMe', authController.protect, updateMe);
+// photo is the field in the form we will use ip upload image
+userRouter.patch(
+  '/updateMe',
+  uploadUserPhoto,
+  authController.protect,
+  updateMe
+);
 userRouter.get('/me', authController.protect, getMe, getUser);
 
 userRouter.use(authController.restrictTo('admin'));

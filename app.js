@@ -61,7 +61,7 @@ app.use(xss());
 
 app.use((req, res, next) => {
   console.log('Hello from middleware');
-  console.log(req.cookies);
+
   next();
 });
 
