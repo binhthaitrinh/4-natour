@@ -10,6 +10,8 @@ const {
   getMonthlyPlan,
   getTourWithin,
   getDistances,
+  resizeTourImages,
+  uploadTourImages,
 } = require('../controllers/tourController');
 const authController = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
@@ -61,6 +63,8 @@ tourRouter
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
+    uploadTourImages,
+    resizeTourImages,
     updateTour
   );
 

@@ -1,3 +1,5 @@
+const sharp = require('sharp');
+const multer = require('multer');
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/APIFeatures');
 const catchAsync = require('../utils/catchAsync');
@@ -18,6 +20,69 @@ const factory = require('./handlerFactory');
 //   }
 //   next();
 // };
+
+// img will be stored as a buffer
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images', 400), false);
+  }
+};
+
+// Upload image
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+const uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+// Only 1 file: upload.single('image')
+// Multiple files: upload.array('images', 5)
+// Mix: above
+
+const resizeTourImages = catchAsync(async (req, res, next) => {
+  console.log(req.files);
+
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // ! Cover Image
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // 2) Other images
+  req.body.images = [];
+
+  // have to await all the promise to finish - video 203
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+
+  console.log(req.body);
+
+  next();
+});
 
 const aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -364,4 +429,6 @@ module.exports = {
   getMonthlyPlan,
   getTourWithin,
   getDistances,
+  uploadTourImages,
+  resizeTourImages,
 };
