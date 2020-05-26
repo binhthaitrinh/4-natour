@@ -259,7 +259,7 @@ exports.isLoggedIn = async (req, res, next) => {
     }
   }
 
-  // next();
+  next();
 };
 
 exports.logout = (req, res) => {

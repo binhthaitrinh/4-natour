@@ -22,6 +22,8 @@ if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    console.log(e);
+
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     login(email, password);

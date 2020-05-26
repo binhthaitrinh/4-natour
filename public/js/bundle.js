@@ -8943,6 +8943,7 @@ if (mapBox) {
 if (loginForm) {
   loginForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    console.log(e);
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     (0, _login.login)(email, password);
@@ -9041,7 +9042,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34375" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "35677" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
